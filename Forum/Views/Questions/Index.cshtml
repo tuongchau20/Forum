@@ -1,0 +1,18 @@
+﻿@model IEnumerable<Forum.Models.Question>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Forum</h1>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+@foreach (var item in Model) {
+   <h4>@item.Title</h4>
+   <p>@item.Description</p>
+    <p>Posted by: @item.User.UserName | Total answers:@item.Answers.Count</p>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
+
+}
