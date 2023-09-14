@@ -13,7 +13,7 @@
 <p>- @Model.User.UserName</p>
 
 <h4>All Answers:</h4>
-@foreach (var answer in Model.Answers)
+@foreach (var answer in Model.Answers.Where(a => a.IsApproved))
 {
     <p>@answer.Content - @answer.User.UserName</p>
     <hr />

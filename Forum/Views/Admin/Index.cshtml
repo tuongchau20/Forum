@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Trang Duyệt Admin</title>
+</head>
+<body>
+    <h1>Trang Duyệt Admin</h1>
+
+    <h2>Câu hỏi chưa được duyệt</h2>
+    <ul>
+        <!-- Hiển thị danh sách các câu hỏi chưa được duyệt -->
+        @foreach (var question in Model.UnapprovedQuestions)
+        {
+            <li>
+                <p>@question.Title</p>
+                <p>@question.Description</p>
+                <!-- Thêm nút duyệt cho câu hỏi -->
+                <form method="post" action="/Admin/ApproveQuestion">
+                    <input type="hidden" name="questionId" value="@question.Id" />
+                    <button type="submit">Duyệt</button>
+                </form>
+            </li>
+        }
+    </ul>
+
+    <h2>Câu trả lời chưa được duyệt</h2>
+    <ul>
+        <!-- Hiển thị danh sách các câu trả lời chưa được duyệt -->
+        @foreach (var answer in Model.UnapprovedAnswers)
+        {
+            <li>
+                <p>@answer.Content</p>
+                <!-- Thêm nút duyệt cho câu trả lời -->
+                <form method="post" action="/Admin/ApproveAnswer">
+                    <input type="hidden" name="answerId" value="@answer.Id" />
+                    <button type="submit">Duyệt</button>
+                </form>
+            </li>
+        }
+    </ul>
+</body>
+</html>

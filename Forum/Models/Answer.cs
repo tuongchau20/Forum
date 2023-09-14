@@ -18,5 +18,7 @@ namespace Forum.Models
         public int? QuestionId { get; set; }
         [ForeignKey("QuestionId")]
         public Question? Question { get; set; }
+        public bool IsApproved { get; set; } // Thuộc tính mới
+
     }
 }

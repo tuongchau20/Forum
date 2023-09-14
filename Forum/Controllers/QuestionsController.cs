@@ -25,31 +25,35 @@ namespace Forum.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Questions.Include(q => q.User).Include(a => a.Answers);
-            return View(await applicationDbContext.ToListAsync());
+            var approvedQuestions = await _context.Questions
+                .Where(q => q.IsApproved) // Chỉ lấy các câu hỏi đã được duyệt
+                .Include(q => q.User)
+                .Include(a => a.Answers.Where(ans => ans.IsApproved)) // Chỉ lấy các câu trả lời đã được duyệt
+                .ToListAsync();
+            return View(approvedQuestions);
         }
-
         // GET: Questions/Details/5
-        [AllowAnynomous]
-          public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Questions == null)
+            [AllowAnynomous]
+              public async Task<IActionResult> Details(int? id)
             {
-                return NotFound();
-            }
+                if (id == null || _context.Questions == null)
+                {
+                    return NotFound();
+                }
 
-            var question = await _context.Questions
-                .Include(q => q.User) 
-                .Include(c => c.Answers)
-                .ThenInclude(q => q.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (question == null)
-            {
-                return NotFound();
-            }
+                var question = await _context.Questions
+                    .Include(q => q.User) 
+                    .Include(c => c.Answers)
+                    .Include(c => c.Answers.Where(a => a.IsApproved)) // Chỉ lấy các câu trả lời đã được duyệt
+                    .ThenInclude(q => q.User)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (question == null)
+                {
+                    return NotFound();
+                }
 
-            return View(question);
-        }
+                return View(question);
+            }
 
         // GET: Questions/Create
         [Authorize]
@@ -68,9 +72,10 @@ namespace Forum.Controllers
         {
             if (ModelState.IsValid)
             {
+                question.IsApproved = false; // Đánh dấu câu hỏi chưa được duyệt
                 _context.Add(question);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Content("Câu hỏi của bạn đã được gửi và đang chờ được duyệt.");
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", question.IdentityUserId);
             return View(question);
@@ -82,18 +87,23 @@ namespace Forum.Controllers
         {
             if (ModelState.IsValid)
             {
+                answer.IsApproved = false;
                 _context.Add(answer);
                 await _context.SaveChangesAsync();
             }
             var question = await _context.Questions
                 .Include(q => q.User)
-                .Include(a => a.Answers)
+                .Include(c => c.Answers.Where(a => a.IsApproved)) // Chỉ lấy các câu trả lời đã được duyệt
                 .ThenInclude(q => q.User)
                 .FirstOrDefaultAsync(q => q.Id == answer.QuestionId);
 
+            if (question == null)
+            {
+                return NotFound();
+            }
+
             return View("Details", question);
         }
-
         // GET: Questions/Edit/5
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
@@ -150,7 +160,6 @@ namespace Forum.Controllers
         }
 
         // GET: Questions/Delete/5
-        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Questions == null)
@@ -171,7 +180,7 @@ namespace Forum.Controllers
 
         // POST: Questions/Delete/5
         [HttpPost, ActionName("Delete")]
-        [Authorize]
+        
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

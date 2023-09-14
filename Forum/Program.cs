@@ -1,12 +1,14 @@
 using Album.Mail;
 using Forum.Data;
 using Forum.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +45,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
 builder.Services.AddOptions();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddSingleton<IEmailSender, SendMailService>();
@@ -85,10 +88,15 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllerRoute(
+    name: "admin",
+        pattern: "Admin/{action=Index}/{id?}",
+        defaults: new { controller = "Admin" });
+app.MapControllerRoute(
+
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 app.Run();

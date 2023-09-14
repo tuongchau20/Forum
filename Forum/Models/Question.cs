@@ -16,5 +16,7 @@ namespace Forum.Models
         public IdentityUser? User { get; set; }
 
         public List<Answer>? Answers { get; set; }
+        public bool IsApproved { get; set; } // Thuộc tính mới
+
     }
 }
