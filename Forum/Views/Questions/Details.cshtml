@@ -6,35 +6,65 @@
 
 @{
     ViewData["Title"] = "Details";
+    bool isAuthenticated = SignInManager.IsSignedIn(User);
 }
 
-<h3>@Model.Title</h3>
-<p>@Model.Description</p>
-<p>- @Model.User.UserName</p>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">@Model.Title</h3>
+                    <p class="card-text">@Model.Description</p>
+                    <p class="card-text">Posted by: @Model.User.UserName</p>
+                </div>
+            </div>
 
-<h4>All Answers:</h4>
-@foreach (var answer in Model.Answers.Where(a => a.IsApproved))
-{
-    <p>@answer.Content - @answer.User.UserName</p>
-    <hr />
-}
+            <h4 class="mt-4">All Answers:</h4>
+            @foreach (var answer in Model.Answers.Where(a => a.IsApproved))
+            {
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <p class="card-text">@answer.Content</p>
+                        <p class="card-text">Answered by: @answer.User.UserName</p>
+                    </div>
+                </div>
+            }
 
-
-<form asp-action="AddAnswer">
-    <div class="form-group">
-        <textarea name="Content" class="form-control"></textarea>
+            @if (isAuthenticated)
+            {
+                <div class="card mt-5">
+                    <div class="card-body">
+                        <h5 class="card-title">Add an Answer</h5>
+                        <form asp-action="AddAnswer">
+                            <div class="form-group">
+                                <textarea name="Content" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" name="IdentityUserId" class="form-control" value="@UserManager.GetUserId(User)" />
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" name="QuestionId" class="form-control" value="@Model.Id" />
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-info" value="Submit" />
+                            </div>
+                        
+                        </form>
+                     
+                    </div>
+                  
+                </div>
+              
+            }
+            else
+            {
+                <p class="mt-5">Please <a href="https://localhost:7060/Identity/Account/Login">log in</a> to submit an answer.</p>
+            }
+            <div class="col-md-4">
+                <a asp-action="Index" class="btn btn-primary mt-5">Back to List</a>
+            </div>
+        </div>
+      
     </div>
-    <div class="form-group">
-        <input type="hidden" name="IdentityUserId" class="form-control" value="@UserManager.GetUserId(User)" />
-    </div>
-    <div class="form-group">
-        <input type="hidden" name="QuestionId" class="form-control" value="@Model.Id" />
-    </div>
-    <div class="form-group">
-        <input type="submit" class="btn btn-info" value="Submit" />
-    </div>
-
-</form>
-
-<a asp-action="Index">Back to List</a>
-
+</div>

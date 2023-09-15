@@ -4,39 +4,44 @@
     <title>Trang Duyệt Admin</title>
 </head>
 <body>
-    <h1>Trang Duyệt Admin</h1>
+    <div class="container">
+        <h2 class="mt-5 text-danger" style="text-align:center">
+            Admin Page
+        </h2>
+        <h4 class="mt-4 text-info">Unapproved Questions</h4>
+        <ul class="list-group">
+            @foreach (var question in Model.UnapprovedQuestions)
+            {
+                <li class="list-group-item">
+                    <h3>@question.Title</h3>
+                    <p>@question.Description</p>
+                    <form method="post" action="/Admin/ApproveQuestion">
+                        <input type="hidden" name="questionId" value="@question.Id" />
+                        <button type="submit" class="btn btn-primary">Duyệt</button>
+                    </form>
+                </li>
+            }
+        </ul>
 
-    <h2>Câu hỏi chưa được duyệt</h2>
-    <ul>
-        <!-- Hiển thị danh sách các câu hỏi chưa được duyệt -->
-        @foreach (var question in Model.UnapprovedQuestions)
-        {
-            <li>
-                <p>@question.Title</p>
-                <p>@question.Description</p>
-                <!-- Thêm nút duyệt cho câu hỏi -->
-                <form method="post" action="/Admin/ApproveQuestion">
-                    <input type="hidden" name="questionId" value="@question.Id" />
-                    <button type="submit">Duyệt</button>
-                </form>
-            </li>
-        }
-    </ul>
+        <h4 class="mt-4 text-info">UnapprovedAnswerst</h4>
+        <ul class="list-group">
+            <!-- Hiển thị danh sách các câu trả lời chưa được duyệt -->
+            @foreach (var answer in Model.UnapprovedAnswers)
+            {
+                <li class="list-group-item">
+                    <p>Question ID: @answer.Question.Id</p>
+                    <p>Title: @answer.Question.Title</p>
+                    <p>@answer.Content</p>
+                    <form method="post" action="/Admin/ApproveAnswer">
+                        <input type="hidden" name="answerId" value="@answer.Id" />
+                        <button type="submit" class="btn btn-primary">Duyệt</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    </div>
 
-    <h2>Câu trả lời chưa được duyệt</h2>
-    <ul>
-        <!-- Hiển thị danh sách các câu trả lời chưa được duyệt -->
-        @foreach (var answer in Model.UnapprovedAnswers)
-        {
-            <li>
-                <p>@answer.Content</p>
-                <!-- Thêm nút duyệt cho câu trả lời -->
-                <form method="post" action="/Admin/ApproveAnswer">
-                    <input type="hidden" name="answerId" value="@answer.Id" />
-                    <button type="submit">Duyệt</button>
-                </form>
-            </li>
-        }
-    </ul>
+    <!-- Thêm link JavaScript của Bootstrap (nếu cần) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+UOLsx3Z6p6O+xS3G2BE5rCB6F5gJz5bc5F5OaP6Ov5Hw5xj" crossorigin="anonymous"></script>
 </body>
 </html>

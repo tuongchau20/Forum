@@ -3,6 +3,7 @@ using Forum.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Controllers
 
@@ -30,7 +31,7 @@ namespace Forum.Controllers
             {
                 UserName = adminEmail,
                 Email = adminEmail,
-                EmailConfirmed = true // Đảm bảo xác thực email (tuỳ chọn)
+                EmailConfirmed = true // Đảm bảo xác thực email 
             };
 
             var result = await _userManager.CreateAsync(adminUser, adminPassword);
@@ -58,7 +59,7 @@ namespace Forum.Controllers
         {
             // Lấy danh sách các câu hỏi và câu trả lời chưa được duyệt
             var unapprovedQuestions = _context.Questions.Where(q => !q.IsApproved).ToList();
-            var unapprovedAnswers = _context.Answers.Where(a => !a.IsApproved).ToList();
+            var unapprovedAnswers = _context.Answers.Include(a => a.Question).Where(a => !a.IsApproved).ToList();
 
             var model = new AdminViewModel
             {

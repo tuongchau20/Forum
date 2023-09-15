@@ -51,8 +51,7 @@ namespace Forum.Controllers
                 {
                     return NotFound();
                 }
-
-                return View(question);
+            return View(question);
             }
 
         // GET: Questions/Create
@@ -70,24 +69,40 @@ namespace Forum.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,IdentityUserId")] Question question)
         {
-            if (ModelState.IsValid)
+            var isAdmin = User.IsInRole("Admin");
+            if (!isAdmin&&ModelState.IsValid)
             {
                 question.IsApproved = false; // Đánh dấu câu hỏi chưa được duyệt
                 _context.Add(question);
                 await _context.SaveChangesAsync();
-                return Content("Câu hỏi của bạn đã được gửi và đang chờ được duyệt.");
+                TempData["SuccessMessage"] = "Your question has been approved.";
+                return RedirectToAction(nameof(Index));
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", question.IdentityUserId);
-            return View(question);
+            else 
+            {
+                question.IsApproved = true;
+                _context.Add(question);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index)); // Nếu là Admin, chuyển hướng đến trang Index
+            }
+
+        
         }
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddAnswer([Bind("Id,Content, QuestionId, IdentityUserId")] Answer answer)
         {
-            if (ModelState.IsValid)
+            var isAdmin = User.IsInRole("Admin");
+            if (!isAdmin && ModelState.IsValid)
             {
                 answer.IsApproved = false;
+                _context.Add(answer);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                answer.IsApproved = true;
                 _context.Add(answer);
                 await _context.SaveChangesAsync();
             }
@@ -104,6 +119,7 @@ namespace Forum.Controllers
 
             return View("Details", question);
         }
+
         // GET: Questions/Edit/5
         [Authorize]
         public async Task<IActionResult> Edit(int? id)

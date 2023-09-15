@@ -43,7 +43,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => {
     options.SignIn.RequireConfirmedPhoneNumber = false;     // Xác thực số điện thoại
     options.SignIn.RequireConfirmedAccount = false;
 })
-        .AddRoles<IdentityRole>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -96,7 +96,7 @@ app.MapControllerRoute(
 app.MapControllerRoute(
 
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Questions}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 
